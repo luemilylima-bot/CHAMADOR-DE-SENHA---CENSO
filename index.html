@@ -71,7 +71,6 @@
 <body>
 <div id="app"></div>
 
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import {
@@ -81,6 +80,7 @@
     onValue
   } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+  /* 🔴 CONFIGURAÇÃO REAL DO SEU FIREBASE */
   const firebaseConfig = {
     apiKey: "AIzaSyDOgoxatsS-a7dgXpVPpPHiT6d7ZWpU",
     authDomain: "chamador-senha-censo.firebaseapp.com",
@@ -91,40 +91,16 @@
     appId: "1:445582190803:web:8b45d608b544122d6cc26",
     measurementId: "G-8D8CQKZXVV"
   };
-
-  const appFB = initializeApp(firebaseConfig);
-  const db = getDatabase(appFB);
-  const senhaRef = ref(db, "senhaAtual");
-
-  onValue(senhaRef, snapshot => {
-    console.log("DADO RECEBIDO:", snapshot.val());
-  });
-</script>
-
-
-  /* 🔴 COLE AQUI EXATAMENTE O firebaseConfig DO SEU PROJETO */
-const firebaseConfig = {
-  apiKey: "AIzaSyDkOgxatxS-7q7dgXpVPppMivT6d7tZwpU",
-  authDomain: "chamador-senha-censo.firebaseapp.com",
-  databaseURL: "https://chamador-senha-censo-default-rtdb.firebaseio.com",
-  projectId: "chamador-senha-censo",
-  storageBucket: "chamador-senha-censo.appspot.com",
-  messagingSenderId: "445582190803",
-  appId: "1:445582190803:web:8b45d608b544122d6cc26",
-  measurementId: "G-8D8CQKZXVV"
-};
   /* 🔴 FIM */
 
-  console.log("Inicializando Firebase...");
-  const appFB = initializeApp(firebaseConfig);
-  const db = getDatabase(appFB);
+  const appFirebase = initializeApp(firebaseConfig);
+  const db = getDatabase(appFirebase);
   const senhaRef = ref(db, "senhaAtual");
 
   const isTV = location.search.includes("tv");
-  console.log("Modo TV:", isTV);
-
   const app = document.getElementById("app");
 
+  /* ===== INTERFACE ===== */
   if (isTV) {
     app.innerHTML = `
       <div class="tv">
@@ -176,17 +152,13 @@ const firebaseConfig = {
       guiche: guiche.value
     };
 
-    console.log("Gravando no Firebase:", dados);
     set(senhaRef, dados);
-    falar(dados); // fala imediatamente no painel
+    falar(dados);
   };
 
   window.repetir = () => {
     onValue(senhaRef, snap => {
-      if (snap.val()) {
-        console.log("Repetindo:", snap.val());
-        falar(snap.val());
-      }
+      if (snap.exists()) falar(snap.val());
     }, { onlyOnce: true });
   };
 
@@ -194,18 +166,11 @@ const firebaseConfig = {
     window.open(location.origin + location.pathname + "?tv", "_blank");
   };
 
-  /* ===== ATUALIZA A TV ===== */
+  /* ===== ATUALIZA A TV EM TEMPO REAL ===== */
   onValue(senhaRef, snap => {
-    if (!isTV) return;
-
-    if (!snap.exists()) {
-      console.warn("Nenhum dado em senhaAtual ainda.");
-      return;
-    }
+    if (!isTV || !snap.exists()) return;
 
     const d = snap.val();
-    console.log("TV recebeu:", d);
-
     document.getElementById("tipo").innerText = d.tipo;
     document.getElementById("senha").innerText =
       String(d.numero).padStart(3, "0");
@@ -214,7 +179,6 @@ const firebaseConfig = {
 
   function falar(d) {
     const texto = `Senha ${d.numero}. ${d.tipo}. ${d.guiche}`;
-    console.log("Falando:", texto);
     const voz = new SpeechSynthesisUtterance(texto);
     voz.lang = "pt-BR";
     voz.rate = 0.95;
