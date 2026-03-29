@@ -5,64 +5,66 @@
 <title>Chamador de Senhas</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
 
-.tv {
-  background: #0d1b2a;
-  color: white;
-  height: 100vh;
-  text-align: center;
-  padding-top: 80px;
-}
+  /* ===== TV ===== */
+  .tv {
+    background: #0d1b2a;
+    color: white;
+    height: 100vh;
+    text-align: center;
+    padding-top: 80px;
+  }
 
-.titulo {
-  font-size: 36px;
-}
+  .titulo {
+    font-size: 36px;
+  }
 
-.tipo {
-  font-size: 48px;
-  color: #ffcc00;
-  margin-top: 20px;
-}
+  .tipo {
+    font-size: 48px;
+    color: #ffcc00;
+    margin-top: 20px;
+  }
 
-.senha {
-  font-size: 130px;
-  margin: 30px 0;
-}
+  .senha {
+    font-size: 130px;
+    margin: 30px 0;
+  }
 
-.guiche {
-  font-size: 42px;
-}
+  .guiche {
+    font-size: 42px;
+  }
 
-.painel {
-  padding: 30px;
-  background: #f2f2f2;
-}
+  /* ===== PAINEL ===== */
+  .painel {
+    background: #f2f2f2;
+    padding: 30px;
+  }
 
-select, input, button {
-  width: 100%;
-  font-size: 18px;
-  padding: 12px;
-  margin-bottom: 15px;
-}
+  select, input, button {
+    width: 100%;
+    font-size: 18px;
+    padding: 12px;
+    margin-bottom: 15px;
+  }
 
-button {
-  background: #0077b6;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
+  button {
+    background: #0077b6;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
 
-button.repetir {
-  background: #6c757d;
-}
+  button.repetir {
+    background: #6c757d;
+  }
 
-button.tv {
-  background: #198754;
-}
+  button.tv {
+    background: #198754;
+  }
 </style>
 </head>
 
@@ -70,108 +72,126 @@ button.tv {
 <div id="app"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-/* 🔴 SEU FIREBASE AQUI */
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
-};
-/* 🔴 FIM */
+  /* 🔴 COLE AQUI EXATAMENTE O firebaseConfig DO SEU PROJETO */
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+    projectId: "SEU_PROJETO",
+    storageBucket: "SEU_PROJETO.appspot.com",
+    messagingSenderId: "XXXX",
+    appId: "XXXX"
+  };
+  /* 🔴 FIM */
 
-const appFB = initializeApp(firebaseConfig);
-const db = getDatabase(appFB);
-const senhaRef = ref(db, "senhaAtual");
+  console.log("Inicializando Firebase...");
+  const appFB = initializeApp(firebaseConfig);
+  const db = getDatabase(appFB);
+  const senhaRef = ref(db, "senhaAtual");
 
-const isTV = location.search.includes("tv");
-const app = document.getElementById("app");
+  const isTV = location.search.includes("tv");
+  console.log("Modo TV:", isTV);
 
-if (isTV) {
-  app.innerHTML = `
-    <div class="tv">
-      <div class="titulo">Chamador de Senhas</div>
-      <div class="tipo" id="tipo">---</div>
-      <div class="senha" id="senha">000</div>
-      <div class="guiche" id="guiche">---</div>
-    </div>`;
-} else {
-  app.innerHTML = `
-    <div class="painel">
-      <h1>Painel do Guichê</h1>
+  const app = document.getElementById("app");
 
-      <select id="tipo">
-        <option>Exames</option>
-        <option>Prioridade</option>
-        <option>Resultados</option>
-      </select>
+  if (isTV) {
+    app.innerHTML = `
+      <div class="tv">
+        <div class="titulo">Chamador de Senhas</div>
+        <div class="tipo" id="tipo">---</div>
+        <div class="senha" id="senha">000</div>
+        <div class="guiche" id="guiche">---</div>
+      </div>
+    `;
+  } else {
+    app.innerHTML = `
+      <div class="painel">
+        <h1>Painel do Guichê</h1>
 
-      <input id="numero" type="number" placeholder="Número da senha">
+        <select id="tipo">
+          <option>Exames</option>
+          <option>Prioridade</option>
+          <option>Resultados</option>
+        </select>
 
-      <select id="guiche">
-        <option>Guichê 1</option>
-        <option>Guichê 2</option>
-        <option>Guichê 3</option>
-        <option>Guichê 4</option>
-        <option>Guichê 5</option>
-      </select>
+        <input id="numero" type="number" placeholder="Número da senha">
 
-      <button onclick="chamar()">Chamar Senha</button>
-      <button class="repetir" onclick="repetir()">Repetir Chamada</button>
-      <button class="tv" onclick="abrirTV()">Abrir Tela TV</button>
-    </div>`;
-}
+        <select id="guiche">
+          <option>Guichê 1</option>
+          <option>Guichê 2</option>
+          <option>Guichê 3</option>
+          <option>Guichê 4</option>
+          <option>Guichê 5</option>
+        </select>
 
-/* ===== FUNÇÕES ===== */
-
-window.chamar = () => {
-  if (!numero.value) {
-    alert("Digite o número da senha");
-    return;
+        <button onclick="chamar()">Chamar Senha</button>
+        <button class="repetir" onclick="repetir()">Repetir Chamada</button>
+        <button class="tv" onclick="abrirTV()">Abrir Tela TV</button>
+      </div>
+    `;
   }
 
-  const dados = {
-    tipo: tipo.value,
-    numero: Number(numero.value),
-    guiche: guiche.value
+  /* ===== FUNÇÕES ===== */
+
+  window.chamar = () => {
+    if (!numero.value) {
+      alert("Digite o número da senha");
+      return;
+    }
+
+    const dados = {
+      tipo: tipo.value,
+      numero: Number(numero.value),
+      guiche: guiche.value
+    };
+
+    console.log("Gravando no Firebase:", dados);
+    set(senhaRef, dados);
+    falar(dados); // fala imediatamente no painel
   };
 
-  set(senhaRef, dados);
-  falar(dados); // ✅ FALA IMEDIATA
-};
+  window.repetir = () => {
+    onValue(senhaRef, snap => {
+      if (snap.val()) {
+        console.log("Repetindo:", snap.val());
+        falar(snap.val());
+      }
+    }, { onlyOnce: true });
+  };
 
-window.repetir = () => {
-  onValue(senhaRef, s => {
-    if (s.val()) falar(s.val());
-  }, { onlyOnce: true });
-};
+  window.abrirTV = () => {
+    window.open(location.origin + location.pathname + "?tv", "_blank");
+  };
 
-window.abrirTV = () => {
-  window.open(location.origin + location.pathname + "?tv", "_blank");
-};
+  /* ===== ATUALIZA A TV ===== */
+  onValue(senhaRef, snap => {
+    if (!isTV) return;
 
-onValue(senhaRef, snap => {
-  if (!isTV || !snap.val()) return;
+    if (!snap.exists()) {
+      console.warn("Nenhum dado em senhaAtual ainda.");
+      return;
+    }
 
-  const d = snap.val();
-  document.getElementById("tipo").innerText = d.tipo;
-  document.getElementById("senha").innerText =
-    String(d.numero).padStart(3, "0");
-  document.getElementById("guiche").innerText = d.guiche;
-});
+    const d = snap.val();
+    console.log("TV recebeu:", d);
 
-function falar(d) {
-  const texto = `Senha ${d.numero}. ${d.tipo}. ${d.guiche}`;
-  const voz = new SpeechSynthesisUtterance(texto);
-  voz.lang = "pt-BR";
-  voz.rate = 0.95;
-  speechSynthesis.speak(voz);
-}
+    document.getElementById("tipo").innerText = d.tipo;
+    document.getElementById("senha").innerText =
+      String(d.numero).padStart(3, "0");
+    document.getElementById("guiche").innerText = d.guiche;
+  });
+
+  function falar(d) {
+    const texto = `Senha ${d.numero}. ${d.tipo}. ${d.guiche}`;
+    console.log("Falando:", texto);
+    const voz = new SpeechSynthesisUtterance(texto);
+    voz.lang = "pt-BR";
+    voz.rate = 0.95;
+    speechSynthesis.speak(voz);
+  }
 </script>
 </body>
 </html>
