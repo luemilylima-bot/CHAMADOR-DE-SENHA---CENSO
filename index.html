@@ -5,66 +5,29 @@
 <title>Chamador de Senhas</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-
-  /* ===== TV ===== */
-  .tv {
-    background: #0d1b2a;
-    color: white;
-    height: 100vh;
-    text-align: center;
-    padding-top: 80px;
-  }
-
-  .titulo {
-    font-size: 36px;
-  }
-
-  .tipo {
-    font-size: 48px;
-    color: #ffcc00;
-    margin-top: 20px;
-  }
-
-  .senha {
-    font-size: 130px;
-    margin: 30px 0;
-  }
-
-  .guiche {
-    font-size: 42px;
-  }
-
-  /* ===== PAINEL ===== */
-  .painel {
-    background: #f2f2f2;
-    padding: 30px;
-  }
-
-  select, input, button {
-    width: 100%;
-    font-size: 18px;
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-
-  button {
-    background: #0077b6;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  button.repetir {
-    background: #6c757d;
-  }
-
-  button.tv {
-    background: #198754;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+.tv {
+  background:#0d1b2a;
+  color:white;
+  height:100vh;
+  text-align:center;
+  padding-top:80px;
+}
+.titulo { font-size:36px; }
+.tipo { font-size:48px; color:#ffcc00; }
+.senha { font-size:130px; margin:30px 0; }
+.guiche { font-size:42px; }
+.painel { padding:30px; background:#f2f2f2; }
+select, input, button {
+  width:100%;
+  font-size:18px;
+  padding:12px;
+  margin-bottom:15px;
+}
+button { background:#0077b6; color:white; border:none; }
 </style>
 </head>
 
@@ -72,118 +35,70 @@
 <div id="app"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import {
-    getDatabase,
-    ref,
-    set,
-    onValue
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set, onValue }
+  from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-  /* 🔴 CONFIGURAÇÃO REAL DO SEU FIREBASE */
-  const firebaseConfig = {
-    apiKey: "AIzaSyDOgoxatsS-a7dgXpVPpPHiT6d7ZWpU",
-    authDomain: "chamador-senha-censo.firebaseapp.com",
-    databaseURL: "https://chamador-senha-censo-default-rtdb.firebaseio.com",
-    projectId: "chamador-senha-censo",
-    storageBucket: "chamador-senha-censo.appspot.com",
-    messagingSenderId: "445582190803",
-    appId: "1:445582190803:web:8b45d608b544122d6cc26",
-    measurementId: "G-8D8CQKZXVV"
-  };
-  /* 🔴 FIM */
+const firebaseConfig = {
+  apiKey: "AIzaSyDOgoxatsS-a7dgXpVPpPHiT6d7ZWpU",
+  authDomain: "chamador-senha-censo.firebaseapp.com",
+  databaseURL: "https://chamador-senha-censo-default-rtdb.firebaseio.com",
+  projectId: "chamador-senha-censo",
+  storageBucket: "chamador-senha-censo.appspot.com",
+  messagingSenderId: "445582190803",
+  appId: "1:445582190803:web:8b45d608b544122d6cc26"
+};
 
-  const appFirebase = initializeApp(firebaseConfig);
-  const db = getDatabase(appFirebase);
-  const senhaRef = ref(db, "senhaAtual");
+const appFB = initializeApp(firebaseConfig);
+const db = getDatabase(appFB);
+const senhaRef = ref(db,"senhaAtual");
 
-  const isTV = location.search.includes("tv");
-  const app = document.getElementById("app");
+const isTV = location.search.includes("tv");
+const app = document.getElementById("app");
 
-  /* ===== INTERFACE ===== */
-  if (isTV) {
-    app.innerHTML = `
-      <div class="tv">
-        <div class="titulo">Chamador de Senhas</div>
-        <div class="tipo" id="tipo">---</div>
-        <div class="senha" id="senha">000</div>
-        <div class="guiche" id="guiche">---</div>
-      </div>
-    `;
-  } else {
-    app.innerHTML = `
-      <div class="painel">
-        <h1>Painel do Guichê</h1>
+if(isTV){
+  app.innerHTML = `
+    <div class="tv">
+      <div class="titulo">Chamador de Senhas</div>
+      <div class="tipo" id="tipo">---</div>
+      <div class="senha" id="senha">000</div>
+      <div class="guiche" id="guiche">---</div>
+    </div>
+  `;
+}else{
+  app.innerHTML = `
+    <div class="painel">
+      <select id="tipo">
+        <option>Exames</option>
+        <option>Prioridade</option>
+      </select>
+      <input id="numero" type="number" placeholder="Número">
+      <select id="guiche">
+        <option>Guichê 1</option>
+        <option>Guichê 2</option>
+      </select>
+      <button onclick="chamar()">Chamar</button>
+    </div>
+  `;
+}
 
-        <select id="tipo">
-          <option>Exames</option>
-          <option>Prioridade</option>
-          <option>Resultados</option>
-        </select>
-
-        <input id="numero" type="number" placeholder="Número da senha">
-
-        <select id="guiche">
-          <option>Guichê 1</option>
-          <option>Guichê 2</option>
-          <option>Guichê 3</option>
-          <option>Guichê 4</option>
-          <option>Guichê 5</option>
-        </select>
-
-        <button onclick="chamar()">Chamar Senha</button>
-        <button class="repetir" onclick="repetir()">Repetir Chamada</button>
-        <button class="tv" onclick="abrirTV()">Abrir Tela TV</button>
-      </div>
-    `;
-  }
-
-  /* ===== FUNÇÕES ===== */
-
-  window.chamar = () => {
-    if (!numero.value) {
-      alert("Digite o número da senha");
-      return;
-    }
-
-    const dados = {
-      tipo: tipo.value,
-      numero: Number(numero.value),
-      guiche: guiche.value
-    };
-
-    set(senhaRef, dados);
-    falar(dados);
-  };
-
-  window.repetir = () => {
-    onValue(senhaRef, snap => {
-      if (snap.exists()) falar(snap.val());
-    }, { onlyOnce: true });
-  };
-
-  window.abrirTV = () => {
-    window.open(location.origin + location.pathname + "?tv", "_blank");
-  };
-
-  /* ===== ATUALIZA A TV EM TEMPO REAL ===== */
-  onValue(senhaRef, snap => {
-    if (!isTV || !snap.exists()) return;
-
-    const d = snap.val();
-    document.getElementById("tipo").innerText = d.tipo;
-    document.getElementById("senha").innerText =
-      String(d.numero).padStart(3, "0");
-    document.getElementById("guiche").innerText = d.guiche;
+window.chamar = () => {
+  set(senhaRef,{
+    tipo: tipo.value,
+    numero: Number(numero.value),
+    guiche: guiche.value
   });
+};
 
-  function falar(d) {
-    const texto = `Senha ${d.numero}. ${d.tipo}. ${d.guiche}`;
-    const voz = new SpeechSynthesisUtterance(texto);
-    voz.lang = "pt-BR";
-    voz.rate = 0.95;
-    speechSynthesis.speak(voz);
-  }
+onValue(senhaRef,s=>{
+  if(!isTV || !s.exists()) return;
+  const d = s.val();
+  tipo.innerText = d.tipo;
+  senha.innerText = String(d.numero).padStart(3,"0");
+  guiche.innerText = d.guiche;
+});
 </script>
+
 </body>
 </html>
+``
