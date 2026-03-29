@@ -71,19 +71,47 @@
 <body>
 <div id="app"></div>
 
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue } from "https://chamador-senha-censo-default-rtdb.firebaseio.com/";
+  import {
+    getDatabase,
+    ref,
+    set,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDOgoxatsS-a7dgXpVPpPHiT6d7ZWpU",
+    authDomain: "chamador-senha-censo.firebaseapp.com",
+    databaseURL: "https://chamador-senha-censo-default-rtdb.firebaseio.com",
+    projectId: "chamador-senha-censo",
+    storageBucket: "chamador-senha-censo.appspot.com",
+    messagingSenderId: "445582190803",
+    appId: "1:445582190803:web:8b45d608b544122d6cc26",
+    measurementId: "G-8D8CQKZXVV"
+  };
+
+  const appFB = initializeApp(firebaseConfig);
+  const db = getDatabase(appFB);
+  const senhaRef = ref(db, "senhaAtual");
+
+  onValue(senhaRef, snapshot => {
+    console.log("DADO RECEBIDO:", snapshot.val());
+  });
+</script>
+
 
   /* 🔴 COLE AQUI EXATAMENTE O firebaseConfig DO SEU PROJETO */
 const firebaseConfig = {
   apiKey: "AIzaSyDkOgxatxS-7q7dgXpVPppMivT6d7tZwpU",
   authDomain: "chamador-senha-censo.firebaseapp.com",
+  databaseURL: "https://chamador-senha-censo-default-rtdb.firebaseio.com",
   projectId: "chamador-senha-censo",
-  storageBucket: "chamador-senha-censo.firebasestorage.app",
+  storageBucket: "chamador-senha-censo.appspot.com",
   messagingSenderId: "445582190803",
-  appId: "1:445582190803:web:e4b55d60bb544122d6cc26",
-  measurementId: "G-8D8CQZKX7V"
+  appId: "1:445582190803:web:8b45d608b544122d6cc26",
+  measurementId: "G-8D8CQKZXVV"
 };
   /* 🔴 FIM */
 
